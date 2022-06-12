@@ -17,7 +17,7 @@ export function Header(): JSX.Element {
       px="6"
       align="center"
     >
-      <Text fontSize="3xl" fontWeight="bold" letterSpacing="tight" w="64">
+      <Text fontSize="3xl" fontWeight="bold" letterSpacing="tight" w="48">
         dashgo
         <Text as="span" ml="1" color="pink.500">
           .
@@ -29,7 +29,7 @@ export function Header(): JSX.Element {
         flex="1"
         py="2"
         px="4"
-        ml="2"
+        ml="8"
         maxWidth={400}
         alignSelf="center"
         align="center"
