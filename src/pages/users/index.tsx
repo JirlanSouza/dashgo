@@ -12,6 +12,7 @@ import {
   Th,
   Thead,
   Tr,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { RiAddLine, RiPencilLine } from "react-icons/ri";
 
@@ -20,6 +21,8 @@ import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
 
 export default function UserList(): JSX.Element {
+  const isWideVersion = useBreakpointValue({ base: false, lg: true });
+
   return (
     <Box>
       <Header />
@@ -48,18 +51,18 @@ export default function UserList(): JSX.Element {
           <Table colorScheme="whiteAlpha">
             <Thead>
               <Tr>
-                <Th px="6" color="gray.300" width="8">
+                <Th px={["4", "4", "6"]} color="gray.300" width="8">
                   <Checkbox colorScheme="pink" />
                 </Th>
                 <Th>Usuário</Th>
-                <Th>Data de cadastro</Th>
+                {isWideVersion && <Th>Data de cadastro</Th>}
                 <Th></Th>
               </Tr>
             </Thead>
 
             <Tbody>
               <Tr>
-                <Td p="6">
+                <Td p={["4", "4", "6"]}>
                   <Checkbox colorScheme="pink" />
                 </Td>
                 <Td>
@@ -70,23 +73,25 @@ export default function UserList(): JSX.Element {
                     </Text>
                   </Box>
                 </Td>
-                <Td>03 de Fevereiro de 2022</Td>
+                {isWideVersion && <Td>03 de Fevereiro de 2022</Td>}
                 <Td textAlign="end">
-                  <Button
-                    as="a"
-                    size="sm"
-                    fontSize="small"
-                    colorScheme="blue"
-                    leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                    cursor="pointer"
-                  >
-                    Editar
-                  </Button>
+                  {isWideVersion && (
+                    <Button
+                      as="a"
+                      size="sm"
+                      fontSize="small"
+                      colorScheme="blue"
+                      leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
+                      cursor="pointer"
+                    >
+                      Editar
+                    </Button>
+                  )}
                 </Td>
               </Tr>
 
               <Tr>
-                <Td p="6">
+                <Td p={["4", "4", "6"]}>
                   <Checkbox colorScheme="pink" />
                 </Td>
                 <Td>
@@ -97,23 +102,25 @@ export default function UserList(): JSX.Element {
                     </Text>
                   </Box>
                 </Td>
-                <Td>03 de Fevereiro de 2022</Td>
+                {isWideVersion && <Td>03 de Fevereiro de 2022</Td>}
                 <Td textAlign="end">
-                  <Button
-                    as="a"
-                    size="sm"
-                    fontSize="small"
-                    colorScheme="blue"
-                    leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                    cursor="pointer"
-                  >
-                    Editar
-                  </Button>
+                  {isWideVersion && (
+                    <Button
+                      as="a"
+                      size="sm"
+                      fontSize="small"
+                      colorScheme="blue"
+                      leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
+                      cursor="pointer"
+                    >
+                      Editar
+                    </Button>
+                  )}
                 </Td>
               </Tr>
 
               <Tr>
-                <Td p="6">
+                <Td p={["4", "4", "6"]}>
                   <Checkbox colorScheme="pink" />
                 </Td>
                 <Td>
@@ -124,23 +131,25 @@ export default function UserList(): JSX.Element {
                     </Text>
                   </Box>
                 </Td>
-                <Td>03 de Fevereiro de 2022</Td>
+                {isWideVersion && <Td>03 de Fevereiro de 2022</Td>}
                 <Td textAlign="end">
-                  <Button
-                    as="a"
-                    size="sm"
-                    fontSize="small"
-                    colorScheme="blue"
-                    leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                    cursor="pointer"
-                  >
-                    Editar
-                  </Button>
+                  {isWideVersion && (
+                    <Button
+                      as="a"
+                      size="sm"
+                      fontSize="small"
+                      colorScheme="blue"
+                      leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
+                      cursor="pointer"
+                    >
+                      Editar
+                    </Button>
+                  )}
                 </Td>
               </Tr>
 
               <Tr>
-                <Td p="6">
+                <Td p={["4", "4", "6"]}>
                   <Checkbox colorScheme="pink" />
                 </Td>
                 <Td>
@@ -151,23 +160,25 @@ export default function UserList(): JSX.Element {
                     </Text>
                   </Box>
                 </Td>
-                <Td>03 de Fevereiro de 2022</Td>
+                {isWideVersion && <Td>03 de Fevereiro de 2022</Td>}
                 <Td textAlign="end">
-                  <Button
-                    as="a"
-                    size="sm"
-                    fontSize="small"
-                    colorScheme="blue"
-                    leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                    cursor="pointer"
-                  >
-                    Editar
-                  </Button>
+                  {isWideVersion && (
+                    <Button
+                      as="a"
+                      size="sm"
+                      fontSize="small"
+                      colorScheme="blue"
+                      leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
+                      cursor="pointer"
+                    >
+                      Editar
+                    </Button>
+                  )}
                 </Td>
               </Tr>
 
               <Tr>
-                <Td p="6">
+                <Td p={["4", "4", "6"]}>
                   <Checkbox colorScheme="pink" />
                 </Td>
                 <Td>
@@ -178,18 +189,20 @@ export default function UserList(): JSX.Element {
                     </Text>
                   </Box>
                 </Td>
-                <Td>03 de Fevereiro de 2022</Td>
+                {isWideVersion && <Td>03 de Fevereiro de 2022</Td>}
                 <Td textAlign="end">
-                  <Button
-                    as="a"
-                    size="sm"
-                    fontSize="small"
-                    colorScheme="blue"
-                    leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                    cursor="pointer"
-                  >
-                    Editar
-                  </Button>
+                  {isWideVersion && (
+                    <Button
+                      as="a"
+                      size="sm"
+                      fontSize="small"
+                      colorScheme="blue"
+                      leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
+                      cursor="pointer"
+                    >
+                      Editar
+                    </Button>
+                  )}
                 </Td>
               </Tr>
             </Tbody>

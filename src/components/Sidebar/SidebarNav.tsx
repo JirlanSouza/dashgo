@@ -1,7 +1,7 @@
 import { Stack } from "@chakra-ui/react";
 import {
   RiContactsLine,
-  RiDashboard2Line,
+  RiDashboardLine,
   RiGitMergeLine,
   RiInputMethodLine,
 } from "react-icons/ri";
@@ -14,7 +14,7 @@ export function SidebarNav(): JSX.Element {
     <Stack spacing="12" align="flex-start">
       <NavSection title="GERAL">
         <>
-          <NavLink icon={RiDashboard2Line}>Dashboard</NavLink>
+          <NavLink icon={RiDashboardLine}>Dashboard</NavLink>
           <NavLink icon={RiContactsLine}>Contatos</NavLink>
         </>
       </NavSection>
