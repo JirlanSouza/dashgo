@@ -17,7 +17,13 @@ export function Header(): JSX.Element {
       px="6"
       align="center"
     >
-      <Text fontSize="3xl" fontWeight="bold" letterSpacing="tight" w="48">
+      <Text
+        fontSize="3xl"
+        fontWeight="bold"
+        letterSpacing="tight"
+        w="48"
+        userSelect="none"
+      >
         dashgo
         <Text as="span" ml="1" color="pink.500">
           .

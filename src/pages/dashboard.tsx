@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
 
 import { Header } from "../components/Header";
-import { SIdebar } from "../components/Sidebar";
+import { Sidebar } from "../components/Sidebar";
 
 const Chart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
@@ -72,7 +72,7 @@ export default function Dashboard(): JSX.Element {
     <Flex direction="column" h="100vh">
       <Header />
       <Flex w="100%" my="6" maxWidth={1480} mx="auto" px="6">
-        <SIdebar />
+        <Sidebar />
 
         <SimpleGrid
           flex="1"
