@@ -1,5 +1,6 @@
 import { Box, Flex, SimpleGrid, Text, theme } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
+import { ApexOptions } from "apexcharts";
 
 import { Header } from "../components/Header";
 import { SIdebar } from "../components/Sidebar";
@@ -7,7 +8,7 @@ import { SIdebar } from "../components/Sidebar";
 const Chart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
-const options = {
+const options: ApexOptions = {
   chart: {
     toolbar: {
       show: false,
@@ -44,6 +45,10 @@ const options = {
       "2022-03-22T00:00:00.000z",
     ],
   },
+  yaxis: {
+    min: 0,
+    forceNiceScale: true,
+  },
   fill: {
     opacity: 0.3,
     type: "gradient",
@@ -53,8 +58,14 @@ const options = {
       opacityTo: 0.3,
     },
   },
+  stroke: {
+    width: 2,
+  },
 };
 const series = [{ name: "series1", data: [45, 69, 102, 86, 68, 58, 71] }];
+const series2 = [
+  { name: "series1", data: [0.6, 0.89, 0.2, 0.56, 0.98, 0.58, 0.71] },
+];
 
 export default function Dashboard(): JSX.Element {
   return (
@@ -80,7 +91,12 @@ export default function Dashboard(): JSX.Element {
             <Text fontSize="lg" mb="4">
               Taxa de abertura
             </Text>
-            <Chart options={options} series={series} type="area" height={160} />
+            <Chart
+              options={options}
+              series={series2}
+              type="area"
+              height={160}
+            />
           </Box>
         </SimpleGrid>
       </Flex>
