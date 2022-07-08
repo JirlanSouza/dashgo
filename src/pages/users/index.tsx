@@ -17,39 +17,15 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { RiAddLine, RiPencilLine } from "react-icons/ri";
-import { useQuery } from "react-query";
 
-import { Header } from "../../components/Header";
-import { Pagination } from "../../components/Pagination";
-import { Sidebar } from "../../components/Sidebar";
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  createdAt: string;
-};
+import { Header } from "@components/Header";
+import { Pagination } from "@components/Pagination";
+import { Sidebar } from "@components/Sidebar";
+import { useUsers } from "@services/hooks/useUsers";
 
 export default function UserList(): JSX.Element {
   const isWideVersion = useBreakpointValue({ base: false, lg: true });
-  const {
-    data: users,
-    isLoading,
-    error,
-  } = useQuery<User[]>(
-    "users",
-    async () => {
-      const response = await fetch("http://localhost:3000/api/users");
-      const data = await response.json();
-
-      return data.users;
-    },
-    1000 * 60 * 5
-  );
-
-  const dateFormate = new Intl.DateTimeFormat("pt-br", {
-    dateStyle: "long",
-  });
+  const { data: users, isLoading, isFetching, error } = useUsers();
 
   return (
     <Box>
@@ -62,6 +38,9 @@ export default function UserList(): JSX.Element {
           <Flex mb="8" justify="space-between" align="center">
             <Heading size="lg" fontWeight="normal">
               Usuários
+              {isFetching && !isLoading && (
+                <Spinner size="sm" color="gray.500" ml="4" />
+              )}
             </Heading>
 
             <Link href="/users/create" passHref>
@@ -80,7 +59,7 @@ export default function UserList(): JSX.Element {
 
           {isLoading ? (
             <Flex flex={1} align="center" justify="center">
-              <Spinner size="lg" />
+              <Spinner size="lg" color="gray.500" />
             </Flex>
           ) : error ? (
             <Flex justify="center">
@@ -115,9 +94,7 @@ export default function UserList(): JSX.Element {
                         </Box>
                       </Td>
                       {isWideVersion && (
-                        <Td textAlign="center">
-                          {dateFormate.format(new Date(user.createdAt))}
-                        </Td>
+                        <Td textAlign="center">{user.createdAt}</Td>
                       )}
                       <Td textAlign="end">
                         {isWideVersion && (

@@ -3,9 +3,9 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 
-import { theme } from "../styles/theme";
-import { SideBarDrawerProvider } from "../components/contexts/SidebarDrawerContext";
-import { makeServer } from "../services/mirage";
+import { theme } from "@styles/theme";
+import { SideBarDrawerProvider } from "@contexts/SidebarDrawerContext";
+import { makeServer } from "@services/mirage";
 
 if (process.env.NODE_ENV === "development") {
   makeServer();
