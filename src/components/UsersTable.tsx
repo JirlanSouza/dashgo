@@ -3,6 +3,7 @@ import {
   Button,
   Checkbox,
   Icon,
+  Link,
   Table,
   Tbody,
   Td,
@@ -17,9 +18,14 @@ import { RiPencilLine } from "react-icons/ri";
 interface UsersTableProps {
   users: User[];
   isWideVersion: boolean;
+  onUserHover: (id: string) => void;
 }
 
-export function UsersTable({ users, isWideVersion }: UsersTableProps) {
+export function UsersTable({
+  users,
+  isWideVersion,
+  onUserHover,
+}: UsersTableProps) {
   return (
     <Table colorScheme="whiteAlpha">
       <Thead>
@@ -42,7 +48,10 @@ export function UsersTable({ users, isWideVersion }: UsersTableProps) {
               </Td>
               <Td>
                 <Box>
-                  <Text fontWeight="bold">{user.name}</Text>
+                  <Link onMouseEnter={() => onUserHover(user.id)}>
+                    <Text fontWeight="bold">{user.name}</Text>
+                  </Link>
+
                   <Text fontSize="small" color="gray.300">
                     {user.email}
                   </Text>

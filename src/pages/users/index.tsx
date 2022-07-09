@@ -9,7 +9,7 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { RiAddLine, RiPencilLine } from "react-icons/ri";
+import { RiAddLine } from "react-icons/ri";
 
 import { Header } from "@components/Header";
 import { Pagination } from "@components/Pagination";
@@ -17,11 +17,16 @@ import { Sidebar } from "@components/Sidebar";
 import { useUsers } from "@services/hooks/useUsers";
 import { UsersTable } from "@components/UsersTable";
 import { useState } from "react";
+import { prefetchUser } from "@services/prefetch/user";
 
 export default function UserList(): JSX.Element {
   const [page, setPage] = useState(1);
   const isWideVersion = useBreakpointValue({ base: false, lg: true });
   const { data, isLoading, isFetching, error } = useUsers(page);
+
+  function handlePrefetchUser(id: string) {
+    prefetchUser(id);
+  }
 
   return (
     <Box>
@@ -62,7 +67,11 @@ export default function UserList(): JSX.Element {
               <Text>Falha ao carregar dados dos usuários.</Text>
             </Flex>
           ) : (
-            <UsersTable users={data.users} isWideVersion={isWideVersion} />
+            <UsersTable
+              users={data.users}
+              isWideVersion={isWideVersion}
+              onUserHover={handlePrefetchUser}
+            />
           )}
           <Pagination
             totalCounterOfRegisters={data?.totalCount}
