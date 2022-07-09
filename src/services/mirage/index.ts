@@ -36,12 +36,11 @@ export function makeServer() {
       this.timing = 750;
 
       this.get("/users", function (schema, request) {
-        const { page = 6, per_page = 10 } = request.queryParams;
+        const { page = 1, per_page = 10 } = request.queryParams;
 
         const total = schema.all("user").length;
         const pageStart = (Number(page) - 1) * Number(per_page);
         const pageEnd = pageStart + Number(per_page);
-        console.log(total, pageStart, pageEnd);
         const users = schema.all("user").slice(pageStart, pageEnd).models;
 
         return new Response(

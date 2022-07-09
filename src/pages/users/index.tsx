@@ -1,18 +1,11 @@
 import {
   Box,
   Button,
-  Checkbox,
   Flex,
   Heading,
   Icon,
   Spinner,
-  Table,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import Link from "next/link";
@@ -22,10 +15,13 @@ import { Header } from "@components/Header";
 import { Pagination } from "@components/Pagination";
 import { Sidebar } from "@components/Sidebar";
 import { useUsers } from "@services/hooks/useUsers";
+import { UsersTable } from "@components/UsersTable";
+import { useState } from "react";
 
 export default function UserList(): JSX.Element {
+  const [page, setPage] = useState(1);
   const isWideVersion = useBreakpointValue({ base: false, lg: true });
-  const { data: users, isLoading, isFetching, error } = useUsers();
+  const { data, isLoading, isFetching, error } = useUsers(page);
 
   return (
     <Box>
@@ -66,57 +62,13 @@ export default function UserList(): JSX.Element {
               <Text>Falha ao carregar dados dos usuários.</Text>
             </Flex>
           ) : (
-            <Table colorScheme="whiteAlpha">
-              <Thead>
-                <Tr>
-                  <Th px={["4", "4", "6"]} color="gray.300" width="8">
-                    <Checkbox colorScheme="pink" />
-                  </Th>
-                  <Th>Usuário</Th>
-                  {isWideVersion && <Th>Data de cadastro</Th>}
-                  <Th></Th>
-                </Tr>
-              </Thead>
-
-              <Tbody>
-                {users.map((user) => {
-                  return (
-                    <Tr key={user.id}>
-                      <Td p={["4", "4", "6"]}>
-                        <Checkbox colorScheme="pink" />
-                      </Td>
-                      <Td>
-                        <Box>
-                          <Text fontWeight="bold">{user.name}</Text>
-                          <Text fontSize="small" color="gray.300">
-                            {user.email}
-                          </Text>
-                        </Box>
-                      </Td>
-                      {isWideVersion && (
-                        <Td textAlign="center">{user.createdAt}</Td>
-                      )}
-                      <Td textAlign="end">
-                        {isWideVersion && (
-                          <Button
-                            as="a"
-                            size="sm"
-                            fontSize="small"
-                            colorScheme="blue"
-                            leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                            cursor="pointer"
-                          >
-                            Editar
-                          </Button>
-                        )}
-                      </Td>
-                    </Tr>
-                  );
-                })}
-              </Tbody>
-            </Table>
+            <UsersTable users={data.users} isWideVersion={isWideVersion} />
           )}
-          <Pagination />
+          <Pagination
+            totalCounterOfRegisters={data?.totalCount}
+            currentPage={page}
+            onPageChange={setPage}
+          />
         </Box>
       </Flex>
     </Box>
