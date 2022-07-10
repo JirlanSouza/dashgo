@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { GetServerSideProps } from "next";
 import {
   Box,
   Button,
@@ -14,15 +16,31 @@ import { RiAddLine } from "react-icons/ri";
 import { Header } from "@components/Header";
 import { Pagination } from "@components/Pagination";
 import { Sidebar } from "@components/Sidebar";
-import { useUsers } from "@services/hooks/useUsers";
+import { getUsers, User, useUsers } from "@services/hooks/useUsers";
 import { UsersTable } from "@components/UsersTable";
-import { useState } from "react";
 import { prefetchUser } from "@services/prefetch/user";
 
-export default function UserList(): JSX.Element {
+interface UserListProps {
+  usersData?: {
+    users: User[];
+    totalCount: number;
+  };
+}
+
+export default function UserList({ usersData }: UserListProps): JSX.Element {
   const [page, setPage] = useState(1);
   const isWideVersion = useBreakpointValue({ base: false, lg: true });
-  const { data, isLoading, isFetching, error } = useUsers(page);
+  const { data, isLoading, isFetching, error } = useUsers(
+    page,
+    usersData
+      ? {
+          initialData: {
+            users: usersData?.users,
+            totalCount: usersData?.totalCount,
+          },
+        }
+      : undefined
+  );
 
   function handlePrefetchUser(id: string) {
     prefetchUser(id);
@@ -83,3 +101,21 @@ export default function UserList(): JSX.Element {
     </Box>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<
+  UserListProps
+> = async () => {
+  try {
+    const response = await getUsers(1);
+
+    return {
+      props: {
+        usersData: { ...response },
+      },
+    };
+  } catch {
+    return {
+      props: {},
+    };
+  }
+};

@@ -24,7 +24,7 @@ export function Pagination({
   currentPage = 1,
   onPageChange,
 }: PaginationProps): JSX.Element {
-  const lastPage = Math.floor(totalCounterOfRegisters / registerPerPage);
+  const lastPage = Math.ceil(totalCounterOfRegisters / registerPerPage);
 
   const previousPages =
     currentPage > 1

@@ -6,6 +6,7 @@ import {
   Heading,
   HStack,
   SimpleGrid,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -15,12 +16,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "@components/Form/Input";
 import { Header } from "@components/Header";
 import { Sidebar } from "@components/Sidebar";
+import { useCreateUser } from "@services/hooks/useCreateUser";
+import { useRouter } from "next/router";
 
 type CreateUserFormData = {
   name: string;
   email: string;
-  password: StaticRangeInit;
-  passwordConfirmation: string;
+  password: string;
+  password_confirmation: string;
 };
 
 const createUserFormSchema = yup.object().shape({
@@ -42,6 +45,10 @@ const createUserFormSchema = yup.object().shape({
 });
 
 export default function CreateUser(): JSX.Element {
+  const toast = useToast();
+  const router = useRouter();
+  const createUser = useCreateUser();
+
   const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(createUserFormSchema),
   });
@@ -49,8 +56,33 @@ export default function CreateUser(): JSX.Element {
   const createUserHandle: SubmitHandler<CreateUserFormData> = async (
     values
   ) => {
-    console.log(values);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await createUser.mutateAsync(values);
+
+    console.log("users", createUser);
+
+    if (createUser.isError) {
+      toast({
+        title: "Error ao criar usuário.",
+        description: "Ouve um error ao criar o novo usuário!",
+        status: "error",
+        duration: 3000,
+        position: "top",
+        isClosable: true,
+      });
+
+      return;
+    }
+
+    toast({
+      title: "Usuário criado.",
+      description: "O usuário foi criado com sucesso!",
+      status: "success",
+      duration: 3000,
+      position: "top",
+      isClosable: true,
+    });
+
+    router.push("/users");
   };
 
   return (
@@ -103,7 +135,7 @@ export default function CreateUser(): JSX.Element {
                 name="password_confirmation"
                 type="password"
                 label="Confirmar senha"
-                error={formState.errors.passwordConfirmation}
+                error={formState.errors.password_confirmation}
                 {...register("passwordConfirmation")}
               />
             </SimpleGrid>
@@ -114,6 +146,7 @@ export default function CreateUser(): JSX.Element {
               <Button
                 colorScheme="whiteAlpha"
                 disabled={formState.isSubmitting}
+                onClick={() => router.back()}
               >
                 Cancelar
               </Button>
