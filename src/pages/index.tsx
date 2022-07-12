@@ -4,6 +4,9 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Input } from "@components/Form/Input";
+import { useAuth } from "@contexts/AuthContext";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 type SignInFormData = {
   email: string;
@@ -19,12 +22,15 @@ const signInFormSchema = yup.object().shape({
 });
 
 export default function SignIn(): JSX.Element {
+  const { signIn } = useAuth();
+  const router = useRouter();
+
   const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(signInFormSchema),
   });
 
   const handleSignIn: SubmitHandler<SignInFormData> = (values) => {
-    console.log(values);
+    signIn(values);
   };
 
   return (
