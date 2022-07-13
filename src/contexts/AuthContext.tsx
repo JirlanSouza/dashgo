@@ -6,9 +6,9 @@ import {
   useState,
 } from "react";
 import Router from "next/router";
-import { setCookie, parseCookies } from "nookies";
 
 import { authApi } from "@services/api";
+import { AuthStorage } from "@services/storage/auth";
 
 type User = {
   email: string;
@@ -33,13 +33,14 @@ type AuthProviderProps = {
 };
 
 const AuthContext = createContext({} as AuthContextData);
+const authStorage = AuthStorage.getInstance();
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User>();
   const [protectedPaths, setProtectedPaths] = useState([]);
 
   useEffect(() => {
-    const { "dashgo.token": token } = parseCookies();
+    const token = authStorage.getStoredToken();
 
     if (token && !user) {
       updateUserFromApi();
@@ -81,15 +82,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.post("/sessions", { email, password });
       const { token, refreshToken, permissions, roles } = response.data;
 
-      setCookie(undefined, "dashgo.token", token, {
-        maxAge: 60 * 24 * 30, // 30 days
-        path: "/",
-      });
-
-      setCookie(undefined, "dashgo.refreshToken", refreshToken, {
-        maxAge: 60 * 24 * 30, // 30 days
-        path: "/",
-      });
+      authStorage.storeAuthTokens({ token, refreshToken });
 
       setUser({
         email,
@@ -97,8 +90,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         roles,
       });
 
-      authApi.defaults.headers["Authorization"] = `Barear ${token}`;
-
+      authApi.updateAuthorization(token);
       Router.push("/dashboard");
     } catch (err) {
       console.error(err);
