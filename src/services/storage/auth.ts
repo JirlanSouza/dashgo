@@ -1,4 +1,4 @@
-import { setCookie, parseCookies } from "nookies";
+import { setCookie, parseCookies, destroyCookie } from "nookies";
 
 export type AuthTokens = {
   token: string;
@@ -7,6 +7,9 @@ export type AuthTokens = {
 
 export class AuthStorage {
   private static instance: AuthStorage;
+  private static tokenCookieName = "dashgo.token";
+  private static refreshTokenCookieName = "dashgo.refreshToken";
+
   private cookies: { [key: string]: string };
   private maxAge: number = 60 * 24 * 30; // 30 days
 
@@ -25,12 +28,12 @@ export class AuthStorage {
   }
 
   storeAuthTokens({ token, refreshToken }: AuthTokens) {
-    setCookie(undefined, "dashgo.token", token, {
+    setCookie(undefined, AuthStorage.tokenCookieName, token, {
       maxAge: this.maxAge,
       path: "/",
     });
 
-    setCookie(undefined, "dashgo.refreshToken", refreshToken, {
+    setCookie(undefined, AuthStorage.refreshTokenCookieName, refreshToken, {
       maxAge: this.maxAge,
       path: "/",
     });
@@ -39,12 +42,17 @@ export class AuthStorage {
   getStoredToken() {
     this.updateCookies();
 
-    return this.cookies["dashgo.token"];
+    return this.cookies[AuthStorage.tokenCookieName];
   }
 
   getStoredRefreshToken() {
     this.updateCookies();
 
-    return this.cookies["dashgo.refreshToken"];
+    return this.cookies[AuthStorage.refreshTokenCookieName];
+  }
+
+  removeTokens() {
+    destroyCookie(undefined, AuthStorage.tokenCookieName);
+    destroyCookie(undefined, AuthStorage.refreshTokenCookieName);
   }
 }

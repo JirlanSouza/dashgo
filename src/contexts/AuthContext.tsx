@@ -9,6 +9,7 @@ import Router from "next/router";
 
 import { authApi } from "@services/api";
 import { AuthStorage } from "@services/storage/auth";
+import { navigateTo } from "@services/navigation";
 
 type User = {
   email: string;
@@ -44,7 +45,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     if (token && !user) {
       updateUserFromApi();
+      return;
     }
+
+    navigateTo("/");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -71,9 +75,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     const isProtectedPath = protectedPaths.includes(Router.pathname);
-    console.log(isProtectedPath, protectedPaths);
+
     if (isProtectedPath) {
-      Router.push("/");
+      authStorage.removeTokens();
+      navigateTo("/");
     }
   }
 
@@ -91,7 +96,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       authApi.updateAuthorization(token);
-      Router.push("/dashboard");
+      navigateTo("/dashboard");
     } catch (err) {
       console.error(err);
     }
