@@ -5,26 +5,15 @@ export type AuthTokens = {
   refreshToken: string;
 };
 
-export class AuthStorage {
-  private static instance: AuthStorage;
+abstract class Storage {
   private static tokenCookieName = "dashgo.token";
   private static refreshTokenCookieName = "dashgo.refreshToken";
 
   private cookies: { [key: string]: string };
   private maxAge: number = 60 * 24 * 30; // 30 days
 
-  private constructor() {}
-
-  static getInstance() {
-    if (!AuthStorage.instance) {
-      AuthStorage.instance = new AuthStorage();
-    }
-
-    return AuthStorage.instance;
-  }
-
-  private updateCookies() {
-    this.cookies = parseCookies();
+  private updateCookies(ctx?) {
+    this.cookies = parseCookies(ctx);
   }
 
   storeAuthTokens({ token, refreshToken }: AuthTokens) {
@@ -39,20 +28,42 @@ export class AuthStorage {
     });
   }
 
-  getStoredToken() {
-    this.updateCookies();
+  getStoredToken(ctx) {
+    this.updateCookies(ctx);
 
     return this.cookies[AuthStorage.tokenCookieName];
   }
 
-  getStoredRefreshToken() {
-    this.updateCookies();
+  getStoredRefreshToken(ctx?) {
+    this.updateCookies(ctx);
 
     return this.cookies[AuthStorage.refreshTokenCookieName];
   }
 
-  removeTokens() {
-    destroyCookie(undefined, AuthStorage.tokenCookieName);
-    destroyCookie(undefined, AuthStorage.refreshTokenCookieName);
+  removeTokens(ctx?) {
+    destroyCookie(ctx, AuthStorage.tokenCookieName);
+    destroyCookie(ctx, AuthStorage.refreshTokenCookieName);
+  }
+}
+
+export class AuthStorage extends Storage {
+  private static instance: AuthStorage;
+
+  private constructor() {
+    super();
+  }
+
+  static getInstance() {
+    if (!AuthStorage.instance) {
+      AuthStorage.instance = new AuthStorage();
+    }
+
+    return AuthStorage.instance;
+  }
+}
+
+export class ServerAuthStorage extends Storage {
+  constructor() {
+    super();
   }
 }

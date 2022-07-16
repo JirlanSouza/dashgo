@@ -2,11 +2,14 @@ import { Button, Flex, Stack } from "@chakra-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useRouter } from "next/router";
+import { GetServerSideProps } from "next";
 
 import { Input } from "@components/Form/Input";
 import { useAuth } from "@contexts/AuthContext";
-import { useEffect } from "react";
-import { useRouter } from "next/router";
+import { parseCookies } from "nookies";
+import { ServerAuthStorage } from "@services/storage/auth";
+import { withSSRGuest } from "@utils/withSSRGuest";
 
 type SignInFormData = {
   email: string;
@@ -76,3 +79,7 @@ export default function SignIn(): JSX.Element {
     </Flex>
   );
 }
+
+export const getServerSideProps = withSSRGuest(async () => {
+  return { props: {} };
+});
