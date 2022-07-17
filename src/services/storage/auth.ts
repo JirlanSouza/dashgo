@@ -1,5 +1,12 @@
 import { setCookie, parseCookies, destroyCookie } from "nookies";
 
+export interface AuthStorage {
+  storeAuthTokens(tokens: AuthTokens): void;
+  getStoredToken(): string;
+  getStoredRefreshToken(): string;
+  removeTokens(): void;
+}
+
 export type AuthTokens = {
   token: string;
   refreshToken: string;
@@ -16,37 +23,37 @@ abstract class Storage {
     this.cookies = parseCookies(ctx);
   }
 
-  storeAuthTokens({ token, refreshToken }: AuthTokens) {
-    setCookie(undefined, AuthStorage.tokenCookieName, token, {
+  protected storeAuthTokens({ token, refreshToken }: AuthTokens, ctx?) {
+    setCookie(ctx, Storage.tokenCookieName, token, {
       maxAge: this.maxAge,
       path: "/",
     });
 
-    setCookie(undefined, AuthStorage.refreshTokenCookieName, refreshToken, {
+    setCookie(ctx, Storage.refreshTokenCookieName, refreshToken, {
       maxAge: this.maxAge,
       path: "/",
     });
   }
 
-  getStoredToken(ctx) {
+  protected getStoredToken(ctx?) {
     this.updateCookies(ctx);
 
-    return this.cookies[AuthStorage.tokenCookieName];
+    return this.cookies[Storage.tokenCookieName];
   }
 
-  getStoredRefreshToken(ctx?) {
+  protected getStoredRefreshToken(ctx?) {
     this.updateCookies(ctx);
 
-    return this.cookies[AuthStorage.refreshTokenCookieName];
+    return this.cookies[Storage.refreshTokenCookieName];
   }
 
-  removeTokens(ctx?) {
-    destroyCookie(ctx, AuthStorage.tokenCookieName);
-    destroyCookie(ctx, AuthStorage.refreshTokenCookieName);
+  protected removeTokens(ctx?) {
+    destroyCookie(ctx, Storage.tokenCookieName);
+    destroyCookie(ctx, Storage.refreshTokenCookieName);
   }
 }
 
-export class AuthStorage extends Storage {
+export class BrowserAuthStorage extends Storage {
   private static instance: AuthStorage;
 
   private constructor() {
@@ -54,16 +61,48 @@ export class AuthStorage extends Storage {
   }
 
   static getInstance() {
-    if (!AuthStorage.instance) {
-      AuthStorage.instance = new AuthStorage();
+    if (!BrowserAuthStorage.instance) {
+      BrowserAuthStorage.instance = new BrowserAuthStorage();
     }
 
-    return AuthStorage.instance;
+    return BrowserAuthStorage.instance;
+  }
+
+  storeAuthTokens(tokens: AuthTokens) {
+    super.storeAuthTokens(tokens);
+  }
+
+  getStoredToken() {
+    return super.getStoredToken();
+  }
+
+  getStoredRefreshToken() {
+    return super.getStoredRefreshToken();
+  }
+
+  removeTokens() {
+    super.removeTokens();
   }
 }
 
 export class ServerAuthStorage extends Storage {
-  constructor() {
+  constructor(private ctx?) {
     super();
+  }
+
+  storeAuthTokens({ token, refreshToken }: AuthTokens) {
+    super.storeAuthTokens(this.ctx);
+  }
+
+  getStoredToken() {
+    return super.getStoredToken(this.ctx);
+  }
+
+  getStoredRefreshToken() {
+    return super.getStoredRefreshToken(this.ctx);
+  }
+
+  removeTokens() {
+    super.removeTokens(this.ctx);
   }
 }

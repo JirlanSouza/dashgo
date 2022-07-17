@@ -10,8 +10,8 @@ export function withSSRGuest<T>(fn: GetServerSideProps<T>) {
   return async (
     ctx: GetServerSidePropsContext
   ): Promise<GetServerSidePropsResult<T>> => {
-    const authStorage = new ServerAuthStorage();
-    const token = authStorage.getStoredToken(ctx);
+    const authStorage = new ServerAuthStorage(ctx);
+    const token = authStorage.getStoredToken();
 
     if (token) {
       return {

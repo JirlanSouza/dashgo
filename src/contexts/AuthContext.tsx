@@ -7,8 +7,8 @@ import {
 } from "react";
 import Router from "next/router";
 
-import { authApi } from "@services/api";
-import { AuthStorage } from "@services/storage/auth";
+import { apiClient } from "@services/api/setupApiClient";
+import { BrowserAuthStorage } from "@services/storage/auth";
 import { navigateTo } from "@services/navigation";
 
 type User = {
@@ -34,7 +34,7 @@ type AuthProviderProps = {
 };
 
 const AuthContext = createContext({} as AuthContextData);
-const authStorage = AuthStorage.getInstance();
+const authStorage = BrowserAuthStorage.getInstance();
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User>();
@@ -47,44 +47,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
       updateUserFromApi();
       return;
     }
-
-    navigateTo("/");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function setProtectedPath(path: string) {
     setProtectedPaths([...protectedPaths, path]);
-    handleProtectedPath();
+    signOut();
   }
 
   async function updateUserFromApi() {
-    try {
-      const response = await authApi.get<User>("/me");
-      const { email, permissions, roles } = response.data;
+    const response = await apiClient.request.get<User>("/me");
+    const userData = response?.data;
 
-      setUser({ email, permissions, roles });
-      handleProtectedPath();
-    } catch {
-      handleProtectedPath();
-    }
-  }
-
-  function handleProtectedPath() {
-    if (user) {
+    if (!userData) {
+      signOut();
       return;
     }
 
-    const isProtectedPath = protectedPaths.includes(Router.pathname);
+    setUser({ ...userData });
+  }
 
-    if (isProtectedPath) {
-      authStorage.removeTokens();
-      navigateTo("/");
-    }
+  function signOut() {
+    authStorage.removeTokens();
+    navigateTo("/");
   }
 
   async function signIn({ email, password }: SignInCredentials) {
     try {
-      const response = await authApi.post("/sessions", { email, password });
+      const response = await apiClient.request.post("/sessions", {
+        email,
+        password,
+      });
       const { token, refreshToken, permissions, roles } = response.data;
 
       authStorage.storeAuthTokens({ token, refreshToken });
@@ -95,7 +88,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         roles,
       });
 
-      authApi.updateAuthorization(token);
+      apiClient.updateAuthorization(token);
       navigateTo("/dashboard");
     } catch (err) {
       console.error(err);

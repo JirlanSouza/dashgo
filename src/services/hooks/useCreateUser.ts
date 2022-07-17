@@ -1,4 +1,4 @@
-import { api } from "@services/api";
+import { apiClient } from "@services/api/setupApiClient";
 import { queryClient } from "@services/queryClient";
 import { useMutation } from "react-query";
 
@@ -13,7 +13,7 @@ export function useCreateUser() {
   return useMutation(
     "users",
     async (user: CreateUserData) => {
-      const response = await api.post("users", {
+      const response = await apiClient.request.post("users", {
         user: {
           ...user,
           created_at: new Date(),

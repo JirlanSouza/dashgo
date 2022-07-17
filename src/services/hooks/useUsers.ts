@@ -1,6 +1,6 @@
 import { useQuery } from "react-query";
 
-import { api } from "@services/api";
+import { apiClient } from "@services/api/setupApiClient";
 import { formatMediumDate } from "@utils/date/formatter";
 import { type } from "os";
 
@@ -28,9 +28,12 @@ export function useUsers(page: number, options?: UseUsersOptions) {
 }
 
 export async function getUsers(page: number): Promise<GetUsersResponse> {
-  const { data, headers } = await api.get<{ users: User[] }>("/users", {
-    params: { page },
-  });
+  const { data, headers } = await apiClient.request.get<{ users: User[] }>(
+    "/users",
+    {
+      params: { page },
+    }
+  );
 
   const totalCount = Number(headers["x-total-count"]);
   const users = data.users.map((user) => ({
