@@ -5,6 +5,15 @@ import {
 } from "next";
 
 import { ServerAuthStorage } from "@services/storage/auth";
+import { AuthTokenError } from "@services/errors/AuthTokenError";
+import { logger } from "./logger/logger";
+
+const homeRedirect = {
+  redirect: {
+    destination: "/",
+    permanent: false,
+  },
+};
 
 export function withSSRAuth<T>(fn: GetServerSideProps<T>) {
   return async (
@@ -14,14 +23,18 @@ export function withSSRAuth<T>(fn: GetServerSideProps<T>) {
     const token = authStorage.getStoredToken();
 
     if (!token) {
-      return {
-        redirect: {
-          destination: "/",
-          permanent: false,
-        },
-      };
+      return homeRedirect;
     }
 
-    return await fn(ctx);
+    try {
+      const fnReturn = await fn(ctx);
+      logger.info(fnReturn);
+      return fnReturn;
+    } catch (err) {
+      logger.info(err.message);
+      if (err instanceof AuthTokenError) {
+        return homeRedirect;
+      }
+    }
   };
 }

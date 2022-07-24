@@ -1,7 +1,7 @@
 import Router from "next/router";
 
 export function navigateTo(path: string) {
-  if (!window) {
+  if (typeof window === "undefined") {
     return;
   }
 

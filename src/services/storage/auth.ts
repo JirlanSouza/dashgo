@@ -1,3 +1,4 @@
+import { logger } from "@utils/logger/logger";
 import { setCookie, parseCookies, destroyCookie } from "nookies";
 
 export interface AuthStorage {
@@ -90,8 +91,8 @@ export class ServerAuthStorage extends Storage {
     super();
   }
 
-  storeAuthTokens({ token, refreshToken }: AuthTokens) {
-    super.storeAuthTokens(this.ctx);
+  storeAuthTokens(tokens: AuthTokens) {
+    super.storeAuthTokens(tokens, this.ctx);
   }
 
   getStoredToken() {

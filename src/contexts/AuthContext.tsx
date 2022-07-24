@@ -56,6 +56,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function updateUserFromApi() {
+    return;
     const response = await apiClient.request.get<User>("/me");
     const userData = response?.data;
 
