@@ -19,6 +19,7 @@ import { Sidebar } from "@components/Sidebar";
 import { getUsers, User, useUsers } from "@services/hooks/useUsers";
 import { UsersTable } from "@components/UsersTable";
 import { prefetchUser } from "@services/prefetch/user";
+import { Can } from "@components/Can";
 
 interface UserListProps {
   usersData?: {
@@ -62,18 +63,20 @@ export default function UserList({ usersData }: UserListProps): JSX.Element {
               )}
             </Heading>
 
-            <Link href="/users/create" passHref>
-              <Button
-                as="a"
-                size="sm"
-                fontSize="small"
-                colorScheme="pink"
-                leftIcon={<Icon as={RiAddLine} fontSize="20" />}
-                cursor="pointer"
-              >
-                Criar novo
-              </Button>
-            </Link>
+            <Can roles={["administrator"]}>
+              <Link href="/users/create" passHref>
+                <Button
+                  as="a"
+                  size="sm"
+                  fontSize="small"
+                  colorScheme="pink"
+                  leftIcon={<Icon as={RiAddLine} fontSize="20" />}
+                  cursor="pointer"
+                >
+                  Criar novo
+                </Button>
+              </Link>
+            </Can>
           </Flex>
 
           {isLoading ? (

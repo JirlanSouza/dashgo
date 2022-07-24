@@ -5,7 +5,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import Router from "next/router";
 
 import { apiClient } from "@services/api/setupApiClient";
 import { BrowserAuthStorage } from "@services/storage/auth";
@@ -24,6 +23,7 @@ type SignInCredentials = {
 
 type AuthContextData = {
   signIn: (credentials: SignInCredentials) => Promise<void>;
+  signOut: () => void;
   isAuthenticated: boolean;
   user: User;
   setProtectedPath: (path: string) => void;
@@ -35,10 +35,29 @@ type AuthProviderProps = {
 
 const AuthContext = createContext({} as AuthContextData);
 const authStorage = BrowserAuthStorage.getInstance();
+let authChanel: BroadcastChannel;
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User>();
   const [protectedPaths, setProtectedPaths] = useState([]);
+
+  useEffect(() => {
+    authChanel = new BroadcastChannel("dashgo.auth");
+
+    authChanel.onmessage = (event) => {
+      switch (event.data) {
+        case "signOut":
+          signOut();
+          break;
+        case "signIn":
+          updateUserFromApi();
+          navigateTo("/dashboard");
+          break;
+        default:
+          break;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const token = authStorage.getStoredToken();
@@ -56,7 +75,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function updateUserFromApi() {
-    return;
+    const token = authStorage.getStoredToken();
+    apiClient.updateAuthorization(token);
     const response = await apiClient.request.get<User>("/me");
     const userData = response?.data;
 
@@ -71,6 +91,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   function signOut() {
     authStorage.removeTokens();
     navigateTo("/");
+
+    if (!user) {
+      return;
+    }
+
+    authChanel.postMessage("signOut");
   }
 
   async function signIn({ email, password }: SignInCredentials) {
@@ -91,6 +117,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       apiClient.updateAuthorization(token);
       navigateTo("/dashboard");
+      authChanel.postMessage("signIn");
     } catch (err) {
       console.error(err);
     }
@@ -98,7 +125,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   return (
     <AuthContext.Provider
-      value={{ signIn, setProtectedPath, isAuthenticated: !!user, user }}
+      value={{
+        signIn,
+        signOut,
+        setProtectedPath,
+        isAuthenticated: !!user,
+        user,
+      }}
     >
       {children}
     </AuthContext.Provider>

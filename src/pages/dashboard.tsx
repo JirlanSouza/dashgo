@@ -1,77 +1,35 @@
-import { Box, Flex, SimpleGrid, Text, theme } from "@chakra-ui/react";
-import dynamic from "next/dynamic";
-import { ApexOptions } from "apexcharts";
+import { Box, Center, Flex, SimpleGrid, Text } from "@chakra-ui/react";
 
 import { Header } from "@components/Header";
 import { Sidebar } from "@components/Sidebar";
 import { withSSRAuth } from "@utils/withSSRAuth";
 import { getServerApiClient } from "@services/api/setupApiClient";
-import { logger } from "@utils/logger/logger";
+import { Chart } from "@components/Charts/dashboardChart";
+import { useCan } from "@services/hooks/useCan";
 
-const Chart = dynamic(() => import("react-apexcharts"), {
-  ssr: false,
-});
+interface DashboardProps {
+  series: any[][];
+}
 
-const options: ApexOptions = {
-  chart: {
-    toolbar: {
-      show: false,
-    },
-    zoom: {
-      enabled: false,
-    },
-    foreColor: theme.colors.gray[500],
-  },
-  grid: {
-    show: false,
-  },
-  dataLabels: {
-    enabled: false,
-  },
-  tooltip: {
-    enabled: false,
-  },
-  xaxis: {
-    type: "datetime",
-    axisBorder: {
-      color: theme.colors.gray[600],
-    },
-    axisTicks: {
-      color: theme.colors.gray[600],
-    },
-    categories: [
-      "2022-03-16T00:00:00.000z",
-      "2022-03-17T00:00:00.000z",
-      "2022-03-18T00:00:00.000z",
-      "2022-03-19T00:00:00.000z",
-      "2022-03-20T00:00:00.000z",
-      "2022-03-21T00:00:00.000z",
-      "2022-03-22T00:00:00.000z",
-    ],
-  },
-  yaxis: {
-    min: 0,
-    forceNiceScale: true,
-  },
-  fill: {
-    opacity: 0.3,
-    type: "gradient",
-    gradient: {
-      shade: "dark",
-      opacityFrom: 0.7,
-      opacityTo: 0.3,
-    },
-  },
-  stroke: {
-    width: 2,
-  },
-};
-const series = [{ name: "series1", data: [45, 69, 102, 86, 68, 58, 71] }];
-const series2 = [
-  { name: "series1", data: [0.6, 0.89, 0.2, 0.56, 0.98, 0.58, 0.71] },
-];
+export default function Dashboard({ series }: DashboardProps): JSX.Element {
+  const useCanSeeMetrics = useCan({ roles: ["administrator", "editor"] });
 
-export default function Dashboard(): JSX.Element {
+  if (!useCanSeeMetrics) {
+    return (
+      <Flex direction="column" h="100vh">
+        <Header />
+        <Flex w="100%" my="6" maxWidth={1480} height="100%" mx="auto" px="6">
+          <Sidebar />
+          <Center width="100%" height="100%">
+            <Text fontSize="larger">
+              Usuário não tem permissão para visualizar as métricas
+            </Text>
+          </Center>
+        </Flex>
+      </Flex>
+    );
+  }
+
   return (
     <Flex direction="column" h="100vh">
       <Header />
@@ -84,23 +42,30 @@ export default function Dashboard(): JSX.Element {
           minChildWidth="320px"
           alignItems="flex-start"
         >
-          <Box p={["6", "8"]} bg="gray.800" borderRadius={8} pb="4">
+          <Box
+            position="relative"
+            p={["6", "8"]}
+            bg="gray.800"
+            borderRadius={8}
+            pb="4"
+          >
             <Text fontSize="lg" mb="4">
               Inscritos da semana
             </Text>
-            <Chart options={options} series={series} type="area" height={160} />
+            <Chart series={series[0]} />
           </Box>
 
-          <Box p={["6", "8"]} bg="gray.800" borderRadius={8} pb="4">
+          <Box
+            position="relative"
+            p={["6", "8"]}
+            bg="gray.800"
+            borderRadius={8}
+            pb="4"
+          >
             <Text fontSize="lg" mb="4">
               Taxa de abertura
             </Text>
-            <Chart
-              options={options}
-              series={series2}
-              type="area"
-              height={160}
-            />
+            <Chart series={series[1]} />
           </Box>
         </SimpleGrid>
       </Flex>
@@ -108,8 +73,17 @@ export default function Dashboard(): JSX.Element {
   );
 }
 
+const series = [
+  [{ name: "series1", data: [45, 69, 102, 86, 68, 58, 71] }],
+  [{ name: "series1", data: [0.6, 0.89, 0.2, 0.56, 0.98, 0.58, 0.71] }],
+];
+
 export const getServerSideProps = withSSRAuth(async (ctx) => {
   const apiClient = getServerApiClient(ctx);
   const response = await apiClient.request.get("/me");
-  return { props: {} };
-});
+  return {
+    props: {
+      series,
+    },
+  };
+}, {});

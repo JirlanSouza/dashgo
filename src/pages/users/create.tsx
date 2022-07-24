@@ -18,6 +18,7 @@ import { Header } from "@components/Header";
 import { Sidebar } from "@components/Sidebar";
 import { useCreateUser } from "@services/hooks/useCreateUser";
 import { useRouter } from "next/router";
+import { withSSRAuth } from "@utils/withSSRAuth";
 
 type CreateUserFormData = {
   name: string;
@@ -164,3 +165,15 @@ export default function CreateUser(): JSX.Element {
     </Box>
   );
 }
+
+export const getServerSideProps = withSSRAuth(
+  async () => {
+    return {
+      props: {},
+    };
+  },
+  {
+    permissions: ["users.create"],
+    roles: ["administrator"],
+  }
+);
